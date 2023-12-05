@@ -19,16 +19,16 @@ class DeleteUserController {
                 return res.status(400).json({mensagem: "Usuário não encontrado"});
             }
 
-            // Deletando dados do usuário
-            const deletedUser = await database.user.delete({
-                where: { id: user.id }
-            });
-
             // Deletando dados do funcionário
             const deletedEmp = await database.employee.delete({
                 where: {
-                    registration: deletedUser.employeeRegistration
+                    registration: user.employeeRegistration
                 }
+            });
+
+            // Deletando dados do usuário
+            const deletedUser = await database.user.delete({
+                where: { id: user.id }
             });
 
             return res.status(200).json({deletedUser, deletedEmp});
