@@ -18,8 +18,12 @@ interface Local {
 }
 
 interface ErrorResponse {
-  message?: string;
-  mensagem?: string;
+  message: string;
+  mensagem: string;
+}
+interface ErrorInfo {
+  message: string;
+  mensagem: string;
 }
 
 function EditarLocal() {
@@ -127,14 +131,14 @@ function EditarLocal() {
 
   //Edicao do Local
   const editarLocal = () => {
-    if (!selectedLocal){
+    if (!selectedLocal) {
       Swal.fire({
         icon: "warning",
         text: "Selecione um local para editar!",
       });
       return;
     }
-  const localId = selectedLocal?.id;
+    const localId = selectedLocal?.id;
     axios
       .put(`/local/${localId}`, {
         departmentBuilding: selectedLocal?.departmentBuilding,
@@ -149,14 +153,20 @@ function EditarLocal() {
           limparCampos();
         }
       })
-      .catch((error) => {
-        let mensagem = JSON.stringify(error.response?.data);
-        let mensagemList = mensagem.split('"');
-        if (error.response?.status == 400) {
-          Swal.fire({
-            icon: "error",
-            text: `${mensagemList[3] + "!"}`,
-          });
+      .catch((error: AxiosError<ErrorResponse>) => {
+        if (error.response?.status === 400) {
+          const errorMessage = error.response?.data?.mensagem;
+          if (errorMessage) {
+            Swal.fire({
+              icon: "error",
+              text: errorMessage,
+            });
+          } else {
+            Swal.fire({
+              icon: "error",
+              text: "Ocorreu um erro ao tentar editar local.",
+            });
+          }
         }
         if (error.response?.status == 403) {
           Swal.fire({
@@ -176,17 +186,16 @@ function EditarLocal() {
       });
   };
 
-  const excluirLocal = () =>{
-    if (!selectedLocal){
+  const excluirLocal = () => {
+    if (!selectedLocal) {
       Swal.fire({
         icon: "warning",
         text: "Selecione um local para excluir!",
       });
       return;
     }
-  const localId = selectedLocal?.id;
-  console.log(localId)
-  axios
+    const localId = selectedLocal?.id;
+    axios
       .delete(`/local/${localId}`)
       .then((response: AxiosResponse) => {
         if (response.status == 200) {
@@ -357,7 +366,7 @@ function EditarLocal() {
                       ...prev,
                       departmentBuilding: e.target.value,
                       id: prev?.id || 0,
-                      room: prev?.room || '',
+                      room: prev?.room || "",
                     }))
                   }
                   className={styles.input}
@@ -375,7 +384,7 @@ function EditarLocal() {
                     onChange={(e) =>
                       setSelectedLocal((prev) => ({
                         ...prev,
-                        departmentBuilding: prev?.departmentBuilding || '',
+                        departmentBuilding: prev?.departmentBuilding || "",
                         id: prev?.id || 0,
                         room: e.target.value,
                       }))
@@ -386,8 +395,12 @@ function EditarLocal() {
               </div>
             </div>
             <div className={styles.botoesInferiores}>
-              <p className={styles.estiloBotao} onClick={editarLocal}>Salvar Alterações</p>
-              <p className={styles.estiloBotaoExcluir} onClick = {excluirLocal}>Excluir Local</p>
+              <p className={styles.estiloBotao} onClick={editarLocal}>
+                Salvar Alterações
+              </p>
+              <p className={styles.estiloBotaoExcluir} onClick={excluirLocal}>
+                Excluir Local
+              </p>
             </div>
           </div>
         )}

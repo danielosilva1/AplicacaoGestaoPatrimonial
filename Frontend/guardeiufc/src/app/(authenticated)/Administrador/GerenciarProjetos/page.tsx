@@ -17,6 +17,11 @@ interface Projeto {
   name: string;
   coordinatorRegistration: number;
 }
+interface ErrorInfo {
+  message: string;
+  mensagem: string;
+}
+
 
 function EditarProjetos() {
   const [showCreate, setShowCreate] = useState(false);
@@ -70,12 +75,14 @@ function EditarProjetos() {
     if (!showEditDelete) {
       setShowCreate(!showCreate);
     }
+    limparCampos();
   };
   // Verifica se a outra tela não está aberta antes de abrir a tela desejada
   const telaEdicaoClicada = () => {
     if (!showCreate) {
       setShowEditDelete(!showEditDelete);
     }
+    limparCampos();
   };
   const validateData = (name: String, cooordinationRegistration: number) => {
     if (name == "" || cooordinationRegistration == 0) {
@@ -113,9 +120,10 @@ function EditarProjetos() {
       })
       .catch((error) => {
         if (error.response?.status == 400) {
+          const error_info  = error.response?.data as ErrorInfo;
           Swal.fire({
-            icon: "error",
-            text: "Já existe projeto com mesmo nome",
+            icon: 'error',
+            text: `${error_info.mensagem}!`
           });
         }
         else if (error.response?.status == 403) {
@@ -161,9 +169,10 @@ function EditarProjetos() {
       })
       .catch((error) => {
         if (error.response?.status == 400) {
+          const error_info  = error.response?.data as ErrorInfo;
           Swal.fire({
-            icon: "error",
-            text: "Já existe projeto com mesmo nome!",
+            icon: 'error',
+            text: `${error_info.mensagem}`
           });
         }
         if (error.response?.status == 403) {
@@ -205,10 +214,11 @@ function EditarProjetos() {
         }
       })
       .catch((error) => {
-        if (error.response?.status == 404) {
+        if (error.response?.status == 400) {
+          const error_info  = error.response?.data as ErrorInfo;
           Swal.fire({
-            icon: "error",
-            text: "O nome do projeto é obrigatório!",
+            icon: 'error',
+            text: `${error_info.mensagem}`
           });
         }
         if (error.response?.status == 403) {
